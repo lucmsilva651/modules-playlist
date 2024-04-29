@@ -1,25 +1,30 @@
-import requests
+def remove_blank(lista):
+    # Iterando e substituindo espaços em branco por %
+    for i in range(len(lista)):
+        if ' ' in lista[i]:
+            lista[i] = lista[i].replace(' ', '%20')
+    return lista
 
-def get_file_urls_via_api(repo_url):
-    api_url = f"https://api.github.com/repos/{repo_url}/contents/"
-    response = requests.get(api_url)
+def readFile(file_path):
+    lista_arquivos = []
+    with open(file_path) as file:
+        lista_arquivos = file.readlines()
+    return lista_arquivos
 
-    if response.status_code == 200:
-        data = response.json()
-        file_urls = [item['download_url'] for item in data if 'download_url' in item]
-        return file_urls
-    else:
-        return []
-
-def generate_m3u_content(file_urls):
+def generate_m3u_content(lista, url):
+    # Gerando o cabeçalho
     m3u_content = "#EXTM3U\n"
-    for url in file_urls:
-        m3u_content += f"{url}\n"
+    # Iterar sobre o tamanho da lista e dar append no m3ucontent
+    for i in range(len(lista)):
+        m3u_content += f"{url}{lista[i]}"
     return m3u_content
 
-repo_url = "lucmsilva651/mod.eleu.me"
-file_urls = get_file_urls_via_api(repo_url)
-m3u_content = generate_m3u_content(file_urls)
+url = "https://raw.githubusercontent.com/lucmsilva651/mod.eleu.me/main/"
+path = input('Caminho do txt: ')
+lista = readFile(path)
+
+remove_blank(lista)
+m3content = generate_m3u_content(lista, url)
 
 with open("modules.m3u", "w") as m3u_file:
-    m3u_file.write(m3u_content)
+    m3u_file.write(m3content)
